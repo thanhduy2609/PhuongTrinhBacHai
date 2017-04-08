@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITextFieldDelegate {
     
     
     
@@ -22,6 +22,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        txtA.delegate = self;
+        txtB.delegate = self;
+        txtC.delegate = self;
     }
     
     override func didReceiveMemoryWarning() {
@@ -45,10 +48,9 @@ class ViewController: UIViewController {
             self.present(alert, animated: true, completion: nil);
         }
         else{
-            
-            if (!isDigits(ten_digits: txtA.text!) || !isDigits(ten_digits: txtB.text!) || !isDigits(ten_digits: txtC.text!) ){
+            if (!isFirstCharacterIsMinus(character: txtA.text!) || !isFirstCharacterIsMinus(character: txtB.text!) || !isFirstCharacterIsMinus(character: txtC.text!)){
                 //create alert
-                let alert = UIAlertController(title: "Thông Báo", message: "Bạn phải nhập số", preferredStyle: UIAlertControllerStyle.alert);
+                let alert = UIAlertController(title: "Thông Báo", message: "Sai định dạng số", preferredStyle: UIAlertControllerStyle.alert);
                 //add an action
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil));
                 //show alert
@@ -89,17 +91,82 @@ class ViewController: UIViewController {
                     }
                 }
             }
+            
+            
         }
         
     }
     func isDigits(ten_digits: String) -> Bool{
         if (!ten_digits.isEmpty){
+            
             let numberCharacters = NSCharacterSet.decimalDigits.inverted;
             return !ten_digits.isEmpty && ten_digits.rangeOfCharacter(from: numberCharacters ) == nil;
             
         }
         return false;
     }
+    
+    func isFirstCharacterIsMinus(character: String) -> Bool{
+        let charAtIndex = character[character.index(character.startIndex, offsetBy: 0)]
+        if (charAtIndex == "-"){
+            var count: Int = 0;
+            for charac in character.characters{
+                if (charac == "-"){
+                    count+=1;
+                }
+            }
+            if (count > 1){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
+        else{
+            var count: Int = 0;
+            for charac in character.characters{
+                if (charac == "-"){
+                    count+=1;
+                }
+            }
+            if (count > 0){
+                return false;
+            }
+            else{
+                return true;
+            }
+
+        }
+        return true;
+    }
+
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let inverseSet = NSCharacterSet(charactersIn:"0123456789-").inverted
+        
+        let components = string.components(separatedBy: inverseSet)
+        
+        let filtered = components.joined(separator: "")
+        
+        if filtered == string {
+            return true
+        } else {
+            if string == "." {
+                let countdots = textField.text!.components(separatedBy:".").count - 1
+                if countdots == 0 {
+                    return true
+                }else{
+                    if countdots > 0 && string == "." {
+                        return false
+                    } else {
+                        return true
+                    }
+                }
+            }else{
+                return false
+            }
+        }
+    }
 
 }
+
 
